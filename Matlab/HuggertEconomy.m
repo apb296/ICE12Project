@@ -6,7 +6,7 @@ close all
 % Technology and Prefernces
 sigma=5; % Risk Aversion
 delta=.9; % Time discount factor
-S=[.1 .2 ]; % Endowment shocks
+S=[.1 .5 ]; % Endowment shocks
 sSize=length(S);
 alpha=.5; % Probability of staying in the same state
 P=[alpha 1-alpha;1-alpha alpha]; % Stochastic shock matrix
@@ -74,36 +74,40 @@ end
 % -- C[a,s,q] --
 aMin=phi;
 aMax=(S(2)/(1-delta))*Para.NonZeroAdj;
-aGridSize=GridDensity*OrderOfApproxConsumptionPolicy;
-aGrid=linspace(aMin,aMax,aGridSize)';
-C0=repmat((1-q).*aGrid,1,sSize)+repmat(S,aGridSize,1);
+aGridSize=OrderOfApproxConsumptionPolicy;
+
+
 CoeffConsumptionPolicy=ones(OrderOfApproxConsumptionPolicy,sSize);
 for inx_s=1:sSize
     C(inx_s) = fundefn(ApproxMethod,OrderOfApproxConsumptionPolicy ,aMin,aMax);
+    aGrid=funnode(C(inx_s));
+    C0=repmat((1-q).*aGrid,1,sSize)+repmat(S,aGridSize,1);
     CoeffConsumptionPolicy(:,inx_s)=funfitxy(C(inx_s),aGrid,C0(:,inx_s));
 end
 
 % -- A[a,s,q] --
 aMin=phi;
 aMax=(S(2)/(1-delta))*Para.NonZeroAdj;
-aGridSize=GridDensity*OrderOfApproxAPolicy;
-aGrid=linspace(aMin,aMax,aGridSize)';
-A0=repmat(aGrid,1,sSize);
+aGridSize=OrderOfApproxAPolicy;
+
+
 CoeffAPolicy=ones(OrderOfApproxAPolicy,sSize);
 for inx_s=1:sSize
     A(inx_s) = fundefn(ApproxMethod,OrderOfApproxAPolicy ,aMin,aMax);
+    aGrid=funnode(A(inx_s));
+    A0=repmat(aGrid,1,sSize);
     CoeffAPolicy(:,inx_s)=funfitxy(A(inx_s),aGrid,A0(:,inx_s));
 end
 
 % -- Gamma[a,s,q]---
 aMin=phi;
 aMax=(S(2)/(1-delta))*Para.NonZeroAdj;
-aGridSize=GridDensity*OrderOfApproxGamma;
-aGrid=linspace(aMin,aMax,aGridSize)';
-Gamma0=repmat(((aGrid-phi)./(-2*phi)),1,2);
+aGridSize=OrderOfApproxGamma;
 CoeffGamma=ones(OrderOfApproxGamma,sSize);
 for inx_s=1:sSize
     Gamma(inx_s) = fundefn(ApproxMethod,OrderOfApproxGamma ,aMin,aMax);
+    aGrid=funnode(Gamma(1));
+    Gamma0=repmat(((aGrid-phi)./(-2*phi)),1,2);
     CoeffGamma(:,inx_s)=FitGammaCoeff(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
     %CoeffGamma(:,inx_s)=FitGammaCoeffLP(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
 end
@@ -151,7 +155,9 @@ aGrid=linspace(aMin,aMax,aGridSize)';
 figure()
 for inx_s=1:sSize
     subplot(1,2,inx_s)
-plot(aGrid,funeval(CoeffConsumptionPolicy(:,inx_s),C(inx_s),aGrid))
+    plot(aGrid,funeval(CoeffConsumptionPolicy(:,inx_s),C(inx_s),aGrid))
+    xlabel('a')
+    ylabel('C(a)')  
 end
 
 
@@ -161,6 +167,7 @@ for inx_s=1:sSize
 plot(aGrid,funeval(CoeffAPolicy(:,inx_s),A(inx_s),aGrid),'k')
 xlabel('a')
 ylabel('A(a)')
+
 line([phi;phi],[aMin,aMax],'LineWidth',2)
 axis([aMin*2 aMax aMin aMax])
 end
@@ -169,7 +176,8 @@ end
 figure()
 for inx_s=1:sSize
     subplot(1,2,inx_s)
-plot(aGrid,funeval(CoeffGamma(:,inx_s),Gamma(inx_s),aGrid))
+    plot(aGrid,funeval(CoeffGamma(:,inx_s),Gamma(inx_s),aGrid))
+    title('Gamma(a)')
 end
 plot(funeval(CoeffGamma(:,inx_s),Gamma(inx_s),aGrid))
 

@@ -10,9 +10,10 @@ sSize=Para.sSize;
 GridDensity=Para.GridDensity;
 OrderOfApproxConsumptionPolicy=Para.OrderOfApproxConsumptionPolicy;
 ApproxMethod='cheb';
-aGridSize=GridDensity*OrderOfApproxConsumptionPolicy;
+%aGridSize=GridDesity*OrderOfApproxConsumptionPolicy;
 
 aGrid=funnode(C(1));%using Chebychef nodes for fitting
+aGridSize=length(aGrid);
 
 CNew=ones(aGridSize,sSize);
 ANew=ones(aGridSize,sSize);
