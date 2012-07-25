@@ -4,9 +4,9 @@ clear all
 close all
 %% SET PARAMETERS 
 % Technology and Prefernces
-sigma=5; % Risk Aversion
+sigma=2; % Risk Aversion
 delta=.9; % Time discount factor
-S=[.1 .5 ]; % Endowment shocks
+S=[.1 .3 ]; % Endowment shocks
 sSize=length(S);
 alpha=.5; % Probability of staying in the same state
 P=[alpha 1-alpha;1-alpha alpha]; % Stochastic shock matrix
@@ -20,9 +20,9 @@ Para.AdhocBorrowingLimit=(-S(1)/(1-delta))*.1;
 
 % others 
 ApproxMethod='cheb';
-OrderOfApproxConsumptionPolicy=5;
-OrderOfApproxAPolicy=5;
-OrderOfApproxGamma=5;
+OrderOfApproxConsumptionPolicy=10;
+OrderOfApproxAPolicy=10;
+OrderOfApproxGamma=15;
 ErrorTol=1e-5;
 GridDensity=3;
 NonZeroAdj=.95;
@@ -33,7 +33,7 @@ Para.GridDensity=GridDensity;
 Para.OrderOfApproxGamma=OrderOfApproxGamma;
 Para.NonZeroAdj=NonZeroAdj;
 grelax=.9;
-NumIter=40;
+NumIter=75;
 Para.NumIter=NumIter;
 Para.ErrorTol=ErrorTol;
 % Set Paths
@@ -108,8 +108,8 @@ for inx_s=1:sSize
     Gamma(inx_s) = fundefn(ApproxMethod,OrderOfApproxGamma ,aMin,aMax);
     aGrid=funnode(Gamma(1));
     Gamma0=repmat(((aGrid-phi)./(-2*phi)),1,2);
-    CoeffGamma(:,inx_s)=FitGammaCoeff(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
-    %CoeffGamma(:,inx_s)=FitGammaCoeffLP(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
+    %CoeffGamma(:,inx_s)=FitGammaCoeff(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
+    CoeffGamma(:,inx_s)=FitGammaCoeffLP(Gamma0(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
 end
  
 Eqb.CoeffConsumptionPolicy=CoeffConsumptionPolicy;
