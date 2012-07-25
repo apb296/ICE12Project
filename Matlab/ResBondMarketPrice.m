@@ -12,7 +12,7 @@ else
 phi=Para.AdhocBorrowingLimit;
 end
 for ctrIn=1:Para.NumIter
-[CoeffConsumptionPolicy,C]=UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
+[CoeffConsumptionPolicy,C]=UpdateConsumptionCoeffLP(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
 [CoeffAPolicy,A]=UpdateACoeff(CoeffConsumptionPolicy,C,A,CoeffAPolicy,q,phi,Para);
 %[CoeffGamma,Gamma]=UpdateGammaCoeff(CoeffAPolicy,A,Gamma,CoeffGamma,phi,Para);
 end

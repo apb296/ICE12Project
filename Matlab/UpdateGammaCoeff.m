@@ -1,4 +1,5 @@
 function [CoeffGamma,Gamma]=UpdateGammaCoeff(CoeffAPolicy,A,Gamma,CoeffGammaOld,phi,Para)
+% description                                    
 sigma=Para.sigma;
 delta=Para.delta;
 S=Para.S;
@@ -9,8 +10,8 @@ sSize=Para.sSize;
 GridDensity=Para.GridDensity;
 OrderOfApproxGamma=Para.OrderOfApproxGamma;
 ApproxMethod='cheb';
-aGridSize=GridDensity*OrderOfApproxGamma*2;
-aGrid=linspace(aMin,aMax,aGridSize)';
+aGridSize=GridDensity*OrderOfApproxGamma;
+aGrid=funnode(Gamma(1));
 CoeffGamma=ones(OrderOfApproxGamma,sSize);
 GammaNew=ones(aGridSize,sSize);
 OrderOfApproxAInv=Para.OrderOfApproxAPolicy;
@@ -27,7 +28,7 @@ for inx_s=1:sSize
 end
 for inx_s=1:sSize
     GammaFit(:,inx_s)=GammaNew*P(inx_s,:)';
-    CoeffGamma(:,inx_s)=FitGammaCoeff(GammaFit(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
+    CoeffGamma(:,inx_s)=FitGammaCoeffLP(GammaFit(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
     %CoeffGamma(:,inx_s)=FitGammaCoeffLP(GammaFit(:,inx_s),aGrid,Gamma(inx_s),phi,Para);
 end
 end

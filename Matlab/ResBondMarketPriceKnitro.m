@@ -11,8 +11,10 @@ phi=(-Para.S(1)/(1-q))*Para.NonZeroAdj;
 else
 phi=Para.AdhocBorrowingLimit;
 end
+count = 0;
 for ctrIn=1:Para.NumIter
-[CoeffConsumptionPolicy,C]=UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
+[CoeffConsumptionPolicy,C]=UpdateConsumptionCoeffLP(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
+count = count +1;
 [CoeffAPolicy,A]=UpdateACoeff(CoeffConsumptionPolicy,C,A,CoeffAPolicy,q,phi,Para);
 %[CoeffGamma,Gamma]=UpdateGammaCoeff(CoeffAPolicy,A,Gamma,CoeffGamma,phi,Para);
 end

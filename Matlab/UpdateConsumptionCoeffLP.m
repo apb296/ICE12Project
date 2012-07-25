@@ -1,4 +1,4 @@
-function [C,CoeffConsumptionPolicy]=UpdateConsumptionCoeffLP(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
+function [CoeffConsumptionPolicy,C]=UpdateConsumptionCoeffLP(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para);
 % Coefficient update by LP with shape constraints
 %   Detailed explanation goes here
 
@@ -14,30 +14,50 @@ OrderOfApproxConsumptionPolicy=Para.OrderOfApproxConsumptionPolicy;
 ApproxMethod='cheb';
 %aGridSize=GridDesity*OrderOfApproxConsumptionPolicy;
 
+
 aGrid=funnode(C(1));%using Chebychef nodes for fitting
 aGridSize=length(aGrid);
 
-CNew=ones(aGridSize,sSize);
-ANew=ones(aGridSize,sSize);
-% ANew = A(a,s) given q. Savings given state today
-CTomorrow=ones(aGridSize,sSize);
-% CTomorrow(s'| a,s) = C[A(a,s),s']
-    
-for inx_s=1:sSize % state today - s
-    
-    ANew(:,inx_s)=max(min(funeval(CoeffAPolicy(:,inx_s),A(inx_s),aGrid),aMax),aMin); % Savings given a,s
-    
-    if ~(C(inx_s).a==phi)
-        C(inx_s) = fundefn(ApproxMethod,OrderOfApproxConsumptionPolicy ,aMin,aMax);
-    end
-    
-    for inx_sTomorrow=1:sSize % state tomorrow - s'
-        CTomorrow(:,inx_sTomorrow)=max(funeval(CoeffConsumptionPolicy(:,inx_sTomorrow),C(inx_sTomorrow),ANew(:,inx_s)),.001); % consumption tomorrow (s'|a,s)
-    end
-    CNew(:,inx_s)=(delta*CTomorrow.^(-sigma)*P(inx_s,:)'/q).^(-1/sigma);
-    CoeffConsumptionPolicy(:,inx_s)=funfitxy(C(inx_s),aGrid,CNew(:,inx_s));
 
-end
+Degree=C(1).n; % n
+
+% Choose the points to fit the value and the shape constraints
+% Take Chebychef nodes for both of them
+
+
+FitPoints = aGrid(1:2:Degree);
+ShapeTestPoints = aGrid(2:2:Degree);
+NumFitPoints=length(FitPoints); % m
+NumShapePoints=length(ShapeTestPoints);
+
+
+
+%FitPoints=aMin+rand(NumFitPoints,1)*(aMax-aMin);
+%ShapeTestPoints=aMin+rand(NumShapePoints,1)*(aMax-aMin);
+
+% Define the linear obj
+Penalty = zeros(Degree,1);
+Penalty(NumFitPoints+1:Degree)=((NumFitPoints+1:Degree)+1-NumFitPoints).^2';
+Obj=ones(Degree,1)+Penalty;
+
+%Equality constraints the first are all set to Gamma0 the second to [0 1]
+Aeq = funbas(C(1),FitPoints,0);
+
+
+beq1 = funeval(CoeffConsumptionPolicy(:,1),C(1),aGrid(1:2:Degree),0);
+beq2 = funeval(CoeffConsumptionPolicy(:,2),C(1),aGrid(1:2:Degree),0);
+
+%Shape constraints Aineq <= 0
+epsilon=1e-6;
+Aineq =-funbas(C(1),ShapeTestPoints,1);
+bineq = -epsilon*ones(NumShapePoints,1);
+
+
+options=optimset('Display', 'off');
+CoeffConsumptionPolicy(:,1) = linprog(Obj,Aineq,bineq,Aeq,beq1,[],[],[],options);
+CoeffConsumptionPolicy(:,2) = linprog(Obj,Aineq,bineq,Aeq,beq2,[],[],[],options);
+
+
 
 
 end

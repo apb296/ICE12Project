@@ -1,5 +1,4 @@
 function [CoeffConsumptionPolicy,C]=UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,CoeffAPolicy,A,q,phi,Para)
-%this version is supposed to preserve the concumption function
 sigma=Para.sigma;
 delta=Para.delta;
 S=Para.S;
@@ -10,11 +9,8 @@ sSize=Para.sSize;
 GridDensity=Para.GridDensity;
 OrderOfApproxConsumptionPolicy=Para.OrderOfApproxConsumptionPolicy;
 ApproxMethod='cheb';
-%aGridSize=GridDesity*OrderOfApproxConsumptionPolicy;
-
-aGrid=funnode(C(1));%using Chebychef nodes for fitting
-aGridSize=length(aGrid);
-
+aGridSize=GridDensity*OrderOfApproxConsumptionPolicy;
+aGrid=linspace(aMin,aMax,aGridSize)';
 CNew=ones(aGridSize,sSize);
 ANew=ones(aGridSize,sSize);
 % ANew = A(a,s) given q. Savings given state today

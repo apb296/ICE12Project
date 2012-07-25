@@ -27,11 +27,14 @@ Obj=ones(Degree,1)+Penalty;
 Aeq1 = funbas(Gamma,FitPoints,0);
 Aeq2 = funbas(Gamma,[aMin; aMax],0);
 Aeq = [Aeq1 ; Aeq2];
-beq = [Gamma0(1:NumFitPoints);0;1];
+beq = [Gamma0(1:2:Degree);0;1];
 
 %Shape constraints Aineq <= 0
+epsilon = 1e-6;
 Aineq =-funbas(Gamma,ShapeTestPoints,1);
-bineq = zeros(length(ShapeTestPoints),1);
+bineq = -epsilon*ones(NumShapePoints,1);
 
-CoeffGamma = linprog(Obj,Aineq,bineq,Aeq,beq);
+
+options=optimset('Display', 'off');
+CoeffGamma = linprog(Obj,Aineq,bineq,Aeq,beq,[],[],[],options);
 end
