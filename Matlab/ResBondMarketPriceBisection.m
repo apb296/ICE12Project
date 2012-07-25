@@ -1,4 +1,4 @@
-function [resINQ,resEQ,varargout] =ResBondMarketPriceKnitro(q,Eqb,Para,OutputFlag)
+function [resEQ] =ResBondMarketPriceBisection(q,Eqb,Para,OutputFlag)
 %q
 %global Eqb;
 resINQ=[];
@@ -14,7 +14,7 @@ end
 
 ctrIn=1;
 DiffCoeffError=1;
-%CoeffConsumptionPolicy00=CoeffConsumptionPolicy;
+CoeffConsumptionPolicy00=CoeffConsumptionPolicy;
 while ctrIn<Para.NumIter && DiffCoeffError>Para.ErrorTol*10
 CoeffConsumptionPolicyOld=CoeffConsumptionPolicy;
 [CoeffConsumptionPolicy,C]=UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,q,phi,Para);
@@ -24,14 +24,13 @@ end
 
 
  if ctrIn==Para.NumIter
- 
- options=optimset('Display','off','TolX',Para.ErrorTol,'MaxFunEvals',Para.NumIter*2);
-  [CoeffConsumptionPolicy,~,exitflag]=fsolve(@ (CoeffConsumptionPolicy) UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,q,phi,Para)-CoeffConsumptionPolicy, CoeffConsumptionPolicy,options);
+     DiffCoeffError;
+ options=optimset('Display','off','TolX',Para.ErrorTol*10,'MaxFunEvals',Para.NumIter*2);
+  [CoeffConsumptionPolicy,~,exitflag]=fsolve(@ (CoeffConsumptionPolicy) UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,q,phi,Para)-CoeffConsumptionPolicy, CoeffConsumptionPolicy00,options);
  % if ~(exitflag==1)
  %    CoeffConsumptionPolicy=CoeffConsumptionPolicy00;
  %end
- %disp(DiffCoeffError);
- %disp('using newton for consumption policy');
+ disp('using newton for consumption policy')
  end
 
 
@@ -54,11 +53,11 @@ Eqb.Gamma=Gamma;
 Eqb.q=q;
 Eqb.phi=phi;
 
-if strcmpi(OutputFlag,'solver')==1
-    varargout{1}=[];
-else
-    varargout{1}=Eqb;
-end
+% if strcmpi(OutputFlag,'solver')==1
+%     varargout{1}=[];
+% else
+%     varargout{1}=Eqb;
+% end
 
 end
 

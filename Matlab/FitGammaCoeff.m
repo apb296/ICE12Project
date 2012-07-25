@@ -1,6 +1,8 @@
 function CoeffGamma=FitGammaCoeff(Gamma0,aGrid,Gamma,phi,Para)
 aMin=phi;
-aMax=(Para.S(2)/(1-Para.delta))*Para.NonZeroAdj;
+
+%aMax=(Para.S(2)/(1-Para.delta))*Para.NonZeroAdj;
+aMax=-phi;
 [CoeffGamma0]=funfitxy(Gamma,aGrid,Gamma0);
 ShapeTestPoints=aGrid(1:2:end);
 %TotalPoints=length(FitPoints)+length(ShapeTestPoints);
