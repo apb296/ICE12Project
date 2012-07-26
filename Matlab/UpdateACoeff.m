@@ -10,9 +10,8 @@ GridDensity=Para.GridDensity;
 OrderOfApproxAPolicy=Para.OrderOfApproxAPolicy;
 ApproxMethod='cheb';
 aGridSize=GridDensity*OrderOfApproxAPolicy;
-aGrid=linspace(aMin,aMax,aGridSize)';
+aGrid=funnode(A(1));
 ANew=ones(aGridSize,sSize);
-
 for inx_s=1:sSize
 ANew(:,inx_s)=max(min((aGrid+repmat(S(inx_s),aGridSize,1)-funeval(CoeffConsumptionPolicy(:,inx_s),C(inx_s),aGrid))./q,aMax),aMin);
 end
