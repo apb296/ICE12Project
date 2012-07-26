@@ -21,11 +21,11 @@ CoeffConsumptionPolicyOld=CoeffConsumptionPolicy;
 DiffCoeffError=sum(sum(abs(CoeffConsumptionPolicy-CoeffConsumptionPolicyOld)));
 ctrIn=ctrIn+1;
 end
-
+ options=optimset('Display','off','TolX',Para.ErrorTol,'MaxFunEvals',Para.NumIter*2);
 
  if ctrIn==Para.NumIter
  
- options=optimset('Display','off','TolX',Para.ErrorTol,'MaxFunEvals',Para.NumIter*2);
+
   [CoeffConsumptionPolicy,~,exitflag]=fsolve(@ (CoeffConsumptionPolicy) UpdateConsumptionCoeff(C,CoeffConsumptionPolicy,q,phi,Para)-CoeffConsumptionPolicy, CoeffConsumptionPolicy,options);
  % if ~(exitflag==1)
  %    CoeffConsumptionPolicy=CoeffConsumptionPolicy00;
@@ -45,6 +45,12 @@ CoeffGammaOld=CoeffGamma;
 DiffGammaError=sum(sum(abs(CoeffGamma-CoeffGammaOld)));
 ctrIn=ctrIn+1;
 end
+ if ctrIn==Para.NumIter
+%if ~(strcmpi(OutputFlag,'solver')==1)
+  [CoeffGamma,~,exitflag]=fsolve(@ (CoeffGamma) UpdateGammaCoeff(CoeffConsumptionPolicy,C,Gamma,CoeffGamma,phi,q,Para)-CoeffGamma, CoeffGamma,options);
+%end
+ end
+
 
 resEQ=ResMarketClearing(CoeffGamma,Gamma, CoeffConsumptionPolicy,C,phi,q,Para);
 Eqb.CoeffConsumptionPolicy=CoeffConsumptionPolicy;
